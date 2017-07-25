@@ -1,0 +1,26 @@
+{
+  "DownloadingFolder": "c:\\Tilos\\Downloading",
+  "FinishedFolder": "c:\\Tilos\\Finished",
+  "Shows": [
+    {
+      "Title": "Csonkamagyarország",
+      "Type": "Beszélgetős",
+      "FeedUrl": "https://tilos.hu/feed/show/csonkamagyarorszag"
+    },
+    {
+      "Title": "Kolorlokál",
+      "Type": "Beszélgetős",
+      "FeedUrl": "https://tilos.hu/feed/show/kolorlokal"
+    },
+    {
+      "Title": "AirBag",
+      "Type": "Zenés",
+      "FeedUrl": "https://tilos.hu/feed/show/airbag"
+    },
+    {
+      "Title": "Hotel North Pole",
+      "Type": "Zenés",
+      "FeedUrl": "https://tilos.hu/feed/show/hotel-north-pole"
+    }
+  ]
+}
