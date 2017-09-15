@@ -1,55 +1,33 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.ServiceModel.Syndication;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TilosFeedDownloader.BusinessLogic;
 
 namespace TilosFeedDownloader.ConsoleApp
 {
 
-  //    /Downloaded
-  //        /Tilos(Szoveges) - Csonka
-  //            file1.mp3
-  //            file2.mp3
-  //        /Tilos (Szoveges) - Kolorlokal
-  //            file1.mp3
-  //            file2.mp3
-  //        /Tilos (Zenes) - Hotel North Pole
-  //            file1.mp3
-  //            file2.mp3
-
-    public class Processor
+    public class TilosFeedProcessor
     {
-        private WebClient _webClient = new WebClient();
         public bool IsProcessing { get; set; }
         public TilosDownloaderConfig Config { get; set; }
+        private FileSystemManager FileSystemManager { get; }
 
-        public Processor(TilosDownloaderConfig config)
+        public TilosFeedProcessor(TilosDownloaderConfig config, FileSystemManager fileSystemManager)
         {
             Config = config;
-            _webClient.DownloadFileCompleted += OnDownloadFileCompleted;
-            _webClient.DownloadProgressChanged += OnDownloadProgressChanged;
+            FileSystemManager = fileSystemManager ?? throw new ArgumentNullException(nameof(fileSystemManager));
         }
 
-        private static string GenerateFilename(string showTitle)
-        {
-            string filename = showTitle;
-            foreach (char c in Path.GetInvalidFileNameChars())
-            {
-                filename = filename.Replace(c, ' ');
-            }
-            filename = filename.Replace('.', ' ');
-            filename = filename.Trim();
-            while (filename.Contains("  ")) filename = filename.Replace("  ", " ");
-            filename += ".mp3";
-            return filename;
-        }
 
-        public void DoCheck()
+
+        public object GetNewItem()
         {
             var feedReader = new TilosFeedReader(Config);
             feedReader.ReadFeeds();
@@ -62,61 +40,78 @@ namespace TilosFeedDownloader.ConsoleApp
                     var mp3Uri = item.Links.Where(l => l.MediaType == "audio/mpeg").First().Uri;
                     Console.WriteLine(mp3Uri);
 
-                    // Generate folder name
-                    var folderName = $"Tilos ({feed.Show.Type}) - {feed.Show.Title}";
-                    var downloadFolder = Path.Combine(Config.DownloadingFolder, folderName);
-                    if (!Directory.Exists(downloadFolder))
-                    {
-                        Directory.CreateDirectory(downloadFolder);
-                    }
+                    //FileSystemManager.
+                    //// Generate folder name
+                    //var folderName = $"Tilos ({feed.Show.Type}) - {feed.Show.Title}";
+                    //var downloadFolder = Path.Combine(Config.DownloadingFolder, folderName);
+                    //if (!Directory.Exists(downloadFolder))
+                    //{
+                    //    Directory.CreateDirectory(downloadFolder);
+                    //}
 
-                    string fileName = GenerateFilename(item.Title.Text);
+                    //string fileName = GenerateFilename(item.Title.Text);
 
 
-                    if (!_webClient.IsBusy)
-                    {
-                        string targetFileName = Path.Combine(downloadFolder, fileName);
-                        _webClient.DownloadFileAsync(mp3Uri, targetFileName, targetFileName); // Here pass artist, album, title...
-                    }
-                    Console.WriteLine("------------------------------------------------");
+                    //if (!_webClient.IsBusy)
+                    //{
+                    //    string targetFileName = Path.Combine(downloadFolder, fileName);
+                    //    _webClient.DownloadFileAsync(mp3Uri, targetFileName, targetFileName); // Here pass artist, album, title...
+                    //}
+                    //Console.WriteLine("------------------------------------------------");
                 }
             }
 
-
+            return null;
         }
 
-        private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            Console.WriteLine(e.ProgressPercentage);
 
-        }
-
-        private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            var tag = TagLib.File.Create((string)e.UserState);
-            tag.Tag.AlbumArtists = new string[] { "Artist1" }; // "Tilos Radio (Zenes)"
-            tag.Tag.Album = ""; // "Csonkamagyarorszag"
-            tag.Tag.Title = "Title"; // 2017. adas.
-            tag.Tag.Comment = "Hello bello"; // long desc
-            tag.Save();
-            Console.WriteLine(e.Error);
-        }
     }
-
 
     class Program
     {
+
         static void Main(string[] args)
         {
+
+            // wake up every 5 minutes
+            // {
+            //      - is a download in progress ? if yes: go back to sleep
+            //      - Download feed from Tilos
+            //      - Check if there's a missing file
+            //      - If no: go back to sleep
+            //      - if yes: go download it, when finished, move it to the right place and tag it
+            //}
+
+            ///  1. downloader - handles downloads, file naming, moving, tagging
+            ///  2. Feed man - handles feed processing
+            ///  3. FileSystemManager
+
+            // Read the current configuration
             var configContent = File.ReadAllText("config.json");
-            var config = Newtonsoft.Json.JsonConvert.DeserializeObject<TilosDownloaderConfig>(configContent);
+            var config = JsonConvert.DeserializeObject<TilosDownloaderConfig>(configContent);
 
-            var p = new Processor(config);
-            p.DoCheck();
+            // Create a FeedProcessor
+            var fileSystemManager = new FileSystemManager(config);
+            var feedProcessor = new TilosFeedProcessor(config, fileSystemManager);
+            var downloadEngine = new DownloadEngine();
 
+            while(true)
+            {
+                if (downloadEngine.IsBusy)
+                {
+                    // Log current status (what is downloading, etc...)
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    var pendingItem = feedProcessor.GetNewItem();
+                    if (pendingItem != null)
+                    {
 
-
-            Console.ReadLine();
+                    }
+                    Thread.Sleep(1000);
+                }
+            }
 
         }
 
