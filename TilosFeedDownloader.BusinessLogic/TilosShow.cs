@@ -10,6 +10,7 @@ namespace TilosFeedDownloader.BusinessLogic
         public string Type { get; set; }
         public string Title { get; set; }
         public string FeedUrl { get; set; }
+        public string ImagePath { get; set; }
     }
 
 }

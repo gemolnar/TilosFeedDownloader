@@ -5,47 +5,56 @@
     {
       "Title": "Csonkamagyarország",
       "Type": "Talk",
-      "FeedUrl": "https://tilos.hu/feed/show/csonkamagyarorszag"
+      "FeedUrl": "https://tilos.hu/feed/show/csonkamagyarorszag",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-csonka.jpg"
     },
     {
       "Title": "Kolorlokál",
       "Type": "Talk",
-      "FeedUrl": "https://tilos.hu/feed/show/kolorlokal"
+      "FeedUrl": "https://tilos.hu/feed/show/kolorlokal",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-kolor.jpg"
     },
     {
       "Title": "7térítő",
       "Type": "Talk",
-      "FeedUrl": "https://tilos.hu/feed/show/7terito"
+      "FeedUrl": "https://tilos.hu/feed/show/7terito",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-7terito.jpg"
     },
     {
       "Title": "Haza és haladás",
       "Type": "Talk",
-      "FeedUrl": "https://tilos.hu/feed/show/haza-es-haladas"
+      "FeedUrl": "https://tilos.hu/feed/show/haza-es-haladas",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-hh.jpg"
     },
     {
       "Title": "AirBag",
       "Type": "Music",
-      "FeedUrl": "https://tilos.hu/feed/show/airbag"
+      "FeedUrl": "https://tilos.hu/feed/show/airbag",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-airbag.jpg"
     },
     {
       "Title": "Ablak-A-Dubra",
       "Type": "Music",
-      "FeedUrl": "https://tilos.hu/feed/show/ablak-a-dubra"
+      "FeedUrl": "https://tilos.hu/feed/show/ablak-a-dubra",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-aad.jpg"
     },
     {
       "Title": "Goaszendvics",
       "Type": "Music",
-      "FeedUrl": "https://tilos.hu/feed/show/goaszendvics"
+      "FeedUrl": "https://tilos.hu/feed/show/goaszendvics",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-goa.jpg"
     },
     {
       "Title": "Kristálykert",
       "Type": "Music",
-      "FeedUrl": "https://tilos.hu/feed/show/kristalykert"
+      "FeedUrl": "https://tilos.hu/feed/show/kristalykert",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-kristaly.jpg"
     },
     {
       "Title": "Hotel North Pole",
       "Type": "Music",
-      "FeedUrl": "https://tilos.hu/feed/show/hotel-north-pole"
+      "FeedUrl": "https://tilos.hu/feed/show/hotel-north-pole",
+      "ImagePath": "c:\\Tilos\\Images\\tilos-hnp.jpg"
     }
   ]
 }

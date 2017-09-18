@@ -49,7 +49,8 @@ namespace TilosFeedDownloader.ConsoleApp
                 string artist = $"Tilos {downloadeShowItem.Show.Type}";
                 tag.Tag.AlbumArtists = new string[] { artist }; // "Tilos Music"
                 tag.Tag.Artists = new string[] { artist };
-                tag.Tag.Pictures = new TagLib.IPicture[] { new TagLib.Picture()}
+                tag.Tag.Performers = new string[] { artist };
+                tag.Tag.Pictures = new TagLib.IPicture[] { new TagLib.Picture(downloadeShowItem.Show.ImagePath) };
                 tag.Tag.Year = (uint)downloadeShowItem.PublishDate.Year;
                 tag.Tag.Album = downloadeShowItem.Show.Title; // "Csonkamagyarorszag"
                 tag.Tag.Title = downloadeShowItem.Title; // 2017. adas.

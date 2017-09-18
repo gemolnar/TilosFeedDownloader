@@ -62,15 +62,6 @@ namespace TilosFeedDownloader.ConsoleApp
                     // Check if the item is missing
                     if (!FileSystemManager.IsDownloaded(tsi))
                         return tsi;
-
-                    //FileSystemManager.
-                    //// Generate folder name
-                    //var folderName = $"Tilos ({feed.Show.Type}) - {feed.Show.Title}";
-                    //var downloadFolder = Path.Combine(Config.DownloadingFolder, folderName);
-                    //if (!Directory.Exists(downloadFolder))
-                    //{
-                    //    Directory.CreateDirectory(downloadFolder);
-                    //}
                 }
             }
             return null;
