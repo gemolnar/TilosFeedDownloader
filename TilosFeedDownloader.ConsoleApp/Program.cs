@@ -13,6 +13,20 @@ using TilosFeedDownloader.BusinessLogic;
 namespace TilosFeedDownloader.ConsoleApp
 {
 
+    public class TilosShowItem
+    {
+        public DateTimeOffset PublishDate { get; internal set; }
+        public string Title { get; internal set; }
+        public string Summary { get; internal set; }
+        public Uri Mp3Uri { get; internal set; }
+        public TilosShow Show { get; internal set; }
+
+        public override string ToString()
+        {
+            return $"[{PublishDate.ToString("yyyy-MM-dd")}] {Show.Title} {Title}";
+        }
+    }
+
     public class TilosFeedProcessor
     {
         public bool IsProcessing { get; set; }
@@ -27,7 +41,7 @@ namespace TilosFeedDownloader.ConsoleApp
 
 
 
-        public object GetNewItem()
+        public TilosShowItem GetFirstMissingItem()
         {
             var feedReader = new TilosFeedReader(Config);
             feedReader.ReadFeeds();
@@ -35,10 +49,19 @@ namespace TilosFeedDownloader.ConsoleApp
             {
                 foreach (SyndicationItem item in feed.FeedItems)
                 {
-                    Console.WriteLine("[{0}][{1}]", item.PublishDate, item.Title.Text);
-                    Console.WriteLine($"{item.Summary.Text}");
-                    var mp3Uri = item.Links.Where(l => l.MediaType == "audio/mpeg").First().Uri;
-                    Console.WriteLine(mp3Uri);
+                    var tsi = new TilosShowItem();
+                    tsi.PublishDate = item.PublishDate;
+                    tsi.Title = item.Title.Text;
+                    tsi.Summary = item.Summary.Text;
+                    tsi.Mp3Uri = item.Links.Where(l => l.MediaType == "audio/mpeg").First().Uri;
+                    tsi.Show = feed.Show;
+
+                    //Console.WriteLine(tsi);
+                    if (DateTimeOffset.Now.Subtract(tsi.PublishDate).TotalDays > 21)
+                        continue;
+                    // Check if the item is missing
+                    if (!FileSystemManager.IsDownloaded(tsi))
+                        return tsi;
 
                     //FileSystemManager.
                     //// Generate folder name
@@ -48,19 +71,8 @@ namespace TilosFeedDownloader.ConsoleApp
                     //{
                     //    Directory.CreateDirectory(downloadFolder);
                     //}
-
-                    //string fileName = GenerateFilename(item.Title.Text);
-
-
-                    //if (!_webClient.IsBusy)
-                    //{
-                    //    string targetFileName = Path.Combine(downloadFolder, fileName);
-                    //    _webClient.DownloadFileAsync(mp3Uri, targetFileName, targetFileName); // Here pass artist, album, title...
-                    //}
-                    //Console.WriteLine("------------------------------------------------");
                 }
             }
-
             return null;
         }
 
@@ -72,20 +84,6 @@ namespace TilosFeedDownloader.ConsoleApp
 
         static void Main(string[] args)
         {
-
-            // wake up every 5 minutes
-            // {
-            //      - is a download in progress ? if yes: go back to sleep
-            //      - Download feed from Tilos
-            //      - Check if there's a missing file
-            //      - If no: go back to sleep
-            //      - if yes: go download it, when finished, move it to the right place and tag it
-            //}
-
-            ///  1. downloader - handles downloads, file naming, moving, tagging
-            ///  2. Feed man - handles feed processing
-            ///  3. FileSystemManager
-
             // Read the current configuration
             var configContent = File.ReadAllText("config.json");
             var config = JsonConvert.DeserializeObject<TilosDownloaderConfig>(configContent);
@@ -93,23 +91,25 @@ namespace TilosFeedDownloader.ConsoleApp
             // Create a FeedProcessor
             var fileSystemManager = new FileSystemManager(config);
             var feedProcessor = new TilosFeedProcessor(config, fileSystemManager);
-            var downloadEngine = new DownloadEngine();
+            var downloadEngine = new DownloadEngine(fileSystemManager);
 
             while(true)
             {
                 if (downloadEngine.IsBusy)
                 {
                     // Log current status (what is downloading, etc...)
-                    Thread.Sleep(1000);
+                    Console.WriteLine(downloadEngine.CurrentStatus);
+                    Thread.Sleep(5000);
                 }
                 else
                 {
-                    var pendingItem = feedProcessor.GetNewItem();
+                    var pendingItem = feedProcessor.GetFirstMissingItem();
                     if (pendingItem != null)
                     {
-
+                        downloadEngine.DownloadShowItem(pendingItem);
+                        // download it
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(5000);
                 }
             }
 

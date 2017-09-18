@@ -4,22 +4,47 @@
   "Shows": [
     {
       "Title": "Csonkamagyarország",
-      "Type": "Beszélgetős",
+      "Type": "Talk",
       "FeedUrl": "https://tilos.hu/feed/show/csonkamagyarorszag"
     },
     {
       "Title": "Kolorlokál",
-      "Type": "Beszélgetős",
+      "Type": "Talk",
       "FeedUrl": "https://tilos.hu/feed/show/kolorlokal"
     },
     {
+      "Title": "7térítő",
+      "Type": "Talk",
+      "FeedUrl": "https://tilos.hu/feed/show/7terito"
+    },
+    {
+      "Title": "Haza és haladás",
+      "Type": "Talk",
+      "FeedUrl": "https://tilos.hu/feed/show/haza-es-haladas"
+    },
+    {
       "Title": "AirBag",
-      "Type": "Zenés",
+      "Type": "Music",
       "FeedUrl": "https://tilos.hu/feed/show/airbag"
     },
     {
+      "Title": "Ablak-A-Dubra",
+      "Type": "Music",
+      "FeedUrl": "https://tilos.hu/feed/show/ablak-a-dubra"
+    },
+    {
+      "Title": "Goaszendvics",
+      "Type": "Music",
+      "FeedUrl": "https://tilos.hu/feed/show/goaszendvics"
+    },
+    {
+      "Title": "Kristálykert",
+      "Type": "Music",
+      "FeedUrl": "https://tilos.hu/feed/show/kristalykert"
+    },
+    {
       "Title": "Hotel North Pole",
-      "Type": "Zenés",
+      "Type": "Music",
       "FeedUrl": "https://tilos.hu/feed/show/hotel-north-pole"
     }
   ]

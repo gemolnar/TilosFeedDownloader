@@ -1,17 +1,13 @@
-﻿using System.Net;
+﻿using System;
+using System.IO;
+using System.Net;
 
 namespace TilosFeedDownloader.ConsoleApp
 {
-    //    /Downloaded
-    //        /Tilos (Szoveges) - Csonka
-    //            file1.mp3
-    //            file2.mp3
-    //        /Tilos (Szoveges) - Kolorlokal
-    //            file1.mp3
-    //            file2.mp3
-    //        /Tilos (Zenes) - Hotel North Pole
-    //            file1.mp3
-    //            file2.mp3
+    // Music/ArtistName - AlbumName/TrackNumber - TrackName.ext
+    
+
+
 
     /// <summary>
     /// Handles downloading and tagging MP3 files from a given location.
@@ -21,29 +17,62 @@ namespace TilosFeedDownloader.ConsoleApp
         private WebClient _webClient;
 
         public bool IsBusy { get; internal set; }
+        public FileSystemManager FileSystemManager { get; }
+        public string CurrentStatus { get; private set; }
 
-        public DownloadEngine()
+        public DownloadEngine(FileSystemManager fileSystemManager)
         {
             _webClient = new WebClient();
             _webClient.DownloadFileCompleted += OnDownloadFileCompleted;
             _webClient.DownloadProgressChanged += OnDownloadProgressChanged;
+            
+            FileSystemManager = fileSystemManager ?? throw new ArgumentNullException(nameof(fileSystemManager));
         }
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            //Console.WriteLine(e.ProgressPercentage);
-
+            var show = (TilosShowItem)e.UserState;
+            CurrentStatus = $"Downloading {show.Mp3Uri}: {e.ProgressPercentage}% ({e.BytesReceived / (1024 * 1024)} MB of {e.TotalBytesToReceive / (1024*1024)} MB)";
         }
 
         private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            //var tag = TagLib.File.Create((string)e.UserState);
-            //tag.Tag.AlbumArtists = new string[] { "Artist1" }; // "Tilos Radio (Zenes)"
-            //tag.Tag.Album = ""; // "Csonkamagyarorszag"
-            //tag.Tag.Title = "Title"; // 2017. adas.
-            //tag.Tag.Comment = "Hello bello"; // long desc
-            //tag.Save();
+            if (e.Error != null)
+            {
+                CurrentStatus = e.Error.Message;
+            }
+            else
+            {
+                var downloadeShowItem = (TilosShowItem)e.UserState;
+                var targetPath = FileSystemManager.GenerateInProgressFullPath(downloadeShowItem);
+                var tag = TagLib.File.Create(targetPath);
+                string artist = $"Tilos {downloadeShowItem.Show.Type}";
+                tag.Tag.AlbumArtists = new string[] { artist }; // "Tilos Music"
+                tag.Tag.Artists = new string[] { artist };
+                tag.Tag.Pictures = new TagLib.IPicture[] { new TagLib.Picture()}
+                tag.Tag.Year = (uint)downloadeShowItem.PublishDate.Year;
+                tag.Tag.Album = downloadeShowItem.Show.Title; // "Csonkamagyarorszag"
+                tag.Tag.Title = downloadeShowItem.Title; // 2017. adas.
+                tag.Tag.Comment = downloadeShowItem.Summary; // long desc
+                tag.Save();
+
+                var finalPath = FileSystemManager.GenerateFinishedFullPath(downloadeShowItem);
+                if (!Directory.Exists(Path.GetDirectoryName(finalPath)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
+
+                File.Move(targetPath, finalPath);
+            }
+            IsBusy = false;
             //Console.WriteLine(e.Error);
+        }
+
+        internal void DownloadShowItem(TilosShowItem pendingItem)
+        {
+            IsBusy = true;
+            var targetPath = FileSystemManager.GenerateInProgressFullPath(pendingItem);
+            if (!Directory.Exists(Path.GetDirectoryName(targetPath)))
+                Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+            _webClient.DownloadFileAsync(pendingItem.Mp3Uri, targetPath, pendingItem);
         }
     }
 }

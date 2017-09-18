@@ -13,10 +13,11 @@ namespace TilosFeedDownloader.ConsoleApp.Tests
     public class FileSystemManagerTests
     {
         [TestMethod()]
-        public void GenerateFilenameTest()
+        public void SanitizeTest()
         {
             var fsm = new FileSystemManager(new TilosDownloaderConfig());
-            var fn = fsm.GenerateFilename("  \\ árviztűrő tükörfúrógép  ?");
+            var fn = fsm.Sanitize("  \\ Árviztűrő Tükörfúrógép  ?");
+            Assert.IsTrue(fn == "arvizturo-tukorfurogep");
         }
     }
 }
